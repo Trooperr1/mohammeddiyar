@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jaff Studio — We craft identity, motion & presence.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  :root {
+    --black: #000000;
+    --white: #ffffff;
+    --serif: 'Cormorant Garamond', Georgia, serif;
+    --sans: 'DM Sans', system-ui, sans-serif;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    cursor: none;
+  }
+
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: var(--sans);
+    font-weight: 300;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── CURSOR ── */
+  #cursor {
+    position: fixed;
+    width: 10px;
+    height: 10px;
+    background: var(--white);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: transform 0.15s ease, opacity 0.2s ease, width 0.25s ease, height 0.25s ease;
+    mix-blend-mode: difference;
+  }
+
+  #cursor.expand {
+    width: 40px;
+    height: 40px;
+  }
+
+  /* ── GRAIN OVERLAY ── */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 9998;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    background-size: 200px 200px;
+    opacity: 0.35;
+    animation: grain 0.5s steps(1) infinite;
+  }
+
+  @keyframes grain {
+    0%   { background-position: 0 0; }
+    10%  { background-position: -5% -10%; }
+    20%  { background-position: -15% 5%; }
+    30%  { background-position: 7% -25%; }
+    40%  { background-position: -5% 25%; }
+    50%  { background-position: -15% 10%; }
+    60%  { background-position: 15% 0%; }
+    70%  { background-position: 0 15%; }
+    80%  { background-position: 3% 35%; }
+    90%  { background-position: -10% 10%; }
+    100% { background-position: 0 0; }
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 2rem 4rem;
+    mix-blend-mode: difference;
+  }
+
+  .nav-logo {
+    font-family: var(--serif);
+    font-size: 1.1rem;
+    font-weight: 400;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--white);
+    text-decoration: none;
+    cursor: none;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 3rem;
+    list-style: none;
+  }
+
+  .nav-links a {
+    font-family: var(--sans);
+    font-size: 0.7rem;
+    font-weight: 400;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--white);
+    text-decoration: none;
+    position: relative;
+    cursor: none;
+  }
+
+  .nav-links a::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background: var(--white);
+    transition: width 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+
+  .nav-links a:hover::after {
+    width: 100%;
+  }
+
+  /* ── HERO ── */
+  #hero {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 0 4rem 5rem;
+    overflow: hidden;
+  }
+
+  #three-canvas {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 1;
+  }
+
+  .hero-title {
+    font-family: var(--serif);
+    font-size: clamp(5rem, 14vw, 14rem);
+    font-weight: 300;
+    line-height: 0.9;
+    letter-spacing: -0.02em;
+    color: var(--white);
+    overflow: hidden;
+    margin-bottom: 2.5rem;
+  }
+
+  .hero-title .word {
+    display: inline-block;
+    overflow: hidden;
+  }
+
+  .hero-title .char {
+    display: inline-block;
+    transform: translateY(110%);
+    opacity: 0;
+    animation: charReveal 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  @keyframes charReveal {
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  .hero-bottom {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 2rem;
+  }
+
+  .hero-tagline {
+    font-family: var(--serif);
+    font-size: clamp(1.1rem, 2.5vw, 1.8rem);
+    font-weight: 300;
+    font-style: italic;
+    letter-spacing: 0.02em;
+    color: var(--white);
+    opacity: 0;
+    animation: fadeUp 1s cubic-bezier(0.16, 1, 0.3, 1) 0.9s forwards;
+    max-width: 500px;
+  }
+
+  @keyframes fadeUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .hero-cta {
+    display: inline-block;
+    font-family: var(--sans);
+    font-size: 0.7rem;
+    font-weight: 400;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--white);
+    text-decoration: none;
+    border: 1px solid rgba(255,255,255,0.5);
+    padding: 1rem 2.5rem;
+    cursor: none;
+    position: relative;
+    overflow: hidden;
+    opacity: 0;
+    animation: fadeUp 1s cubic-bezier(0.16, 1, 0.3, 1) 1.1s forwards;
+    transition: border-color 0.3s ease;
+  }
+
+  .hero-cta::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--white);
+    transform: translateX(-101%);
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .hero-cta span {
+    position: relative;
+    z-index: 1;
+    transition: color 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .hero-cta:hover {
+    border-color: var(--white);
+  }
+
+  .hero-cta:hover::before {
+    transform: translateX(0);
+  }
+
+  .hero-cta:hover span {
+    color: var(--black);
+  }
+
+  .scroll-indicator {
+    position: absolute;
+    bottom: 2.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    opacity: 0;
+    animation: fadeUp 1s ease 1.5s forwards;
+  }
+
+  .scroll-indicator span {
+    font-size: 0.6rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    opacity: 0.4;
+  }
+
+  .scroll-line {
+    width: 1px;
+    height: 50px;
+    background: linear-gradient(to bottom, rgba(255,255,255,0.5), transparent);
+    animation: scrollPulse 2s ease-in-out infinite;
+  }
+
+  @keyframes scrollPulse {
+    0%, 100% { transform: scaleY(1); opacity: 0.5; }
+    50% { transform: scaleY(0.5); opacity: 1; }
+  }
+
+  /* ── SECTION SHARED ── */
+  section {
+    position: relative;
+    z-index: 10;
+    background: var(--black);
+  }
+
+  .section-label {
+    font-family: var(--sans);
+    font-size: 0.65rem;
+    font-weight: 400;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.4);
+    margin-bottom: 4rem;
+  }
+
+  /* ── REVEAL ANIMATION ── */
+  .reveal {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1), transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .reveal-delay-1 { transition-delay: 0.1s; }
+  .reveal-delay-2 { transition-delay: 0.2s; }
+  .reveal-delay-3 { transition-delay: 0.3s; }
+  .reveal-delay-4 { transition-delay: 0.4s; }
+  .reveal-delay-5 { transition-delay: 0.5s; }
+
+  /* ── SERVICES ── */
+  #services {
+    padding: 10rem 4rem;
+  }
+
+  .services-header {
+    margin-bottom: 6rem;
+  }
+
+  .services-heading {
+    font-family: var(--serif);
+    font-size: clamp(3rem, 7vw, 7rem);
+    font-weight: 300;
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+
+  .services-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+    border-top: 1px solid rgba(255,255,255,0.1);
+  }
+
+  .service-card {
+    padding: 3.5rem 3rem 3.5rem 0;
+    border-right: 1px solid rgba(255,255,255,0.1);
+    cursor: none;
+    position: relative;
+    transition: padding 0.3s ease;
+  }
+
+  .service-card:last-child {
+    border-right: none;
+    padding-right: 0;
+  }
+
+  .service-card:not(:first-child) {
+    padding-left: 3rem;
+  }
+
+  .service-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: rgba(255,255,255,0.15);
+    transform: scaleX(0);
+    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    transform-origin: left;
+  }
+
+  .service-card:hover::after {
+    transform: scaleX(1);
+  }
+
+  .service-icon {
+    width: 48px;
+    height: 48px;
+    margin-bottom: 2.5rem;
+    opacity: 0.7;
+  }
+
+  .service-number {
+    font-family: var(--serif);
+    font-size: 0.75rem;
+    font-weight: 300;
+    letter-spacing: 0.2em;
+    color: rgba(255,255,255,0.3);
+    margin-bottom: 1.5rem;
+  }
+
+  .service-title {
+    font-family: var(--serif);
+    font-size: clamp(1.6rem, 2.5vw, 2.2rem);
+    font-weight: 400;
+    line-height: 1.1;
+    margin-bottom: 1.5rem;
+    letter-spacing: -0.01em;
+  }
+
+  .service-line {
+    font-family: var(--serif);
+    font-size: 1rem;
+    font-weight: 300;
+    font-style: italic;
+    color: rgba(255,255,255,0.55);
+    line-height: 1.5;
+  }
+
+  /* ── ABOUT ── */
+  #about {
+    padding: 10rem 4rem;
+    border-top: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .about-inner {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 6rem;
+    align-items: start;
+  }
+
+  .about-statement {
+    font-family: var(--serif);
+    font-size: clamp(2rem, 4.5vw, 4.5rem);
+    font-weight: 300;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    color: var(--white);
+    grid-column: 2;
+  }
+
+  .about-statement em {
+    font-style: italic;
+    color: rgba(255,255,255,0.55);
+  }
+
+  .about-label-col {
+    grid-column: 1;
+    grid-row: 1;
+    padding-top: 0.5rem;
+  }
+
+  .about-meta {
+    margin-top: 3rem;
+    grid-column: 2;
+    display: flex;
+    gap: 4rem;
+  }
+
+  .about-meta-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .about-meta-num {
+    font-family: var(--serif);
+    font-size: 2.5rem;
+    font-weight: 300;
+    line-height: 1;
+  }
+
+  .about-meta-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.4);
+  }
+
+  /* ── CONTACT ── */
+  #contact {
+    padding: 10rem 4rem 6rem;
+    border-top: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .contact-heading {
+    font-family: var(--serif);
+    font-size: clamp(4rem, 10vw, 11rem);
+    font-weight: 300;
+    line-height: 0.95;
+    letter-spacing: -0.03em;
+    margin-bottom: 5rem;
+    max-width: 900px;
+  }
+
+  .contact-heading em {
+    font-style: italic;
+    color: rgba(255,255,255,0.45);
+  }
+
+  .contact-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 2rem;
+    margin-bottom: 5rem;
+  }
+
+  .contact-email-block {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+
+  .contact-email-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.35);
+  }
+
+  .contact-email {
+    font-family: var(--serif);
+    font-size: clamp(1.2rem, 2.5vw, 2rem);
+    font-weight: 300;
+    color: var(--white);
+    text-decoration: none;
+    cursor: none;
+    position: relative;
+  }
+
+  .contact-email::after {
+    content: '';
+    position: absolute;
+    bottom: -3px;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background: var(--white);
+    transition: width 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+
+  .contact-email:hover::after {
+    width: 100%;
+  }
+
+  .contact-socials {
+    display: flex;
+    gap: 2rem;
+    list-style: none;
+  }
+
+  .contact-socials a {
+    font-size: 0.65rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.4);
+    text-decoration: none;
+    cursor: none;
+    position: relative;
+    transition: color 0.3s ease;
+  }
+
+  .contact-socials a:hover {
+    color: var(--white);
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    border-top: 1px solid rgba(255,255,255,0.1);
+    padding: 2rem 4rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    background: var(--black);
+    position: relative;
+    z-index: 10;
+  }
+
+  .footer-copy {
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.25);
+  }
+
+  .footer-mark {
+    font-family: var(--serif);
+    font-size: 0.8rem;
+    font-weight: 300;
+    font-style: italic;
+    color: rgba(255,255,255,0.2);
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 900px) {
+    nav {
+      padding: 1.5rem 2rem;
+    }
+
+    .nav-links {
+      gap: 1.5rem;
+    }
+
+    #hero {
+      padding: 0 2rem 4rem;
+    }
+
+    #services,
+    #about,
+    #contact {
+      padding-left: 2rem;
+      padding-right: 2rem;
+    }
+
+    .services-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .service-card {
+      border-right: none;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      padding: 3rem 0;
+    }
+
+    .service-card:not(:first-child) {
+      padding-left: 0;
+    }
+
+    .service-card:last-child {
+      border-bottom: none;
+    }
+
+    .about-inner {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+
+    .about-label-col {
+      grid-column: 1;
+      grid-row: auto;
+    }
+
+    .about-statement {
+      grid-column: 1;
+    }
+
+    .about-meta {
+      grid-column: 1;
+    }
+
+    footer {
+      padding: 2rem;
+    }
+  }
+
+  @media (max-width: 600px) {
+    nav {
+      padding: 1.2rem 1.5rem;
+    }
+
+    .nav-links {
+      display: none;
+    }
+
+    #hero {
+      padding: 0 1.5rem 3.5rem;
+    }
+
+    #services,
+    #about,
+    #contact {
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+      padding-top: 6rem;
+      padding-bottom: 6rem;
+    }
+
+    .hero-bottom {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .about-meta {
+      flex-wrap: wrap;
+      gap: 2rem;
+    }
+
+    .contact-info {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    footer {
+      padding: 1.5rem;
+    }
+  }
+
+  @media (pointer: coarse) {
+    #cursor { display: none; }
+    html { cursor: auto; }
+    a, button { cursor: pointer; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Custom cursor -->
+<div id="cursor"></div>
+
+<!-- Navigation -->
+<nav>
+  <a href="#" class="nav-logo">Jaff Studio</a>
+  <ul class="nav-links">
+    <li><a href="#services">Services</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- Hero Section -->
+<section id="hero">
+  <canvas id="three-canvas"></canvas>
+
+  <div class="hero-content">
+    <div class="hero-title" id="hero-title" aria-label="Jaff Studio"></div>
+    <div class="hero-bottom">
+      <p class="hero-tagline">We craft identity, motion &amp; presence.</p>
+      <a href="#services" class="hero-cta"><span>View Our Work</span></a>
+    </div>
+  </div>
+
+  <div class="scroll-indicator">
+    <span>Scroll</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- Services Section -->
+<section id="services">
+  <div class="services-header">
+    <p class="section-label reveal">What We Do</p>
+    <h2 class="services-heading reveal reveal-delay-1">Our Services</h2>
+  </div>
+
+  <div class="services-grid">
+    <!-- Motion Graphics -->
+    <div class="service-card reveal">
+      <div class="service-number">01</div>
+      <svg class="service-icon" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="24" cy="24" r="20" stroke="white" stroke-width="0.75"/>
+        <path d="M16 24 L20 16 L28 28 L32 20" stroke="white" stroke-width="0.75" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="36" cy="24" r="1.5" fill="white" opacity="0.5"/>
+        <circle cx="12" cy="24" r="1.5" fill="white" opacity="0.5"/>
+      </svg>
+      <h3 class="service-title">Motion<br>Graphics</h3>
+      <p class="service-line">Stories that move.</p>
+    </div>
+
+    <!-- Branding -->
+    <div class="service-card reveal reveal-delay-2">
+      <div class="service-number">02</div>
+      <svg class="service-icon" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="8" y="8" width="32" height="32" stroke="white" stroke-width="0.75"/>
+        <line x1="8" y1="24" x2="40" y2="24" stroke="white" stroke-width="0.75" opacity="0.4"/>
+        <line x1="24" y1="8" x2="24" y2="40" stroke="white" stroke-width="0.75" opacity="0.4"/>
+        <circle cx="24" cy="24" r="6" stroke="white" stroke-width="0.75"/>
+      </svg>
+      <h3 class="service-title">Branding</h3>
+      <p class="service-line">Identity built to last.</p>
+    </div>
+
+    <!-- Social Media -->
+    <div class="service-card reveal reveal-delay-3">
+      <div class="service-number">03</div>
+      <svg class="service-icon" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="12" cy="24" r="4" stroke="white" stroke-width="0.75"/>
+        <circle cx="36" cy="12" r="4" stroke="white" stroke-width="0.75"/>
+        <circle cx="36" cy="36" r="4" stroke="white" stroke-width="0.75"/>
+        <line x1="16" y1="22" x2="32" y2="14" stroke="white" stroke-width="0.75"/>
+        <line x1="16" y1="26" x2="32" y2="34" stroke="white" stroke-width="0.75"/>
+      </svg>
+      <h3 class="service-title">Social Media<br>Management</h3>
+      <p class="service-line">Presence, curated.</p>
+    </div>
+  </div>
+</section>
+
+<!-- About Section -->
+<section id="about">
+  <div class="about-inner">
+    <div class="about-label-col reveal">
+      <p class="section-label">About</p>
+    </div>
+
+    <p class="about-statement reveal reveal-delay-1">
+      Jaff Studio is a boutique creative agency built on the belief that <em>great design is felt before it is seen.</em>
+    </p>
+
+    <div class="about-meta reveal reveal-delay-2">
+      <div class="about-meta-item">
+        <span class="about-meta-num">5+</span>
+        <span class="about-meta-label">Years</span>
+      </div>
+      <div class="about-meta-item">
+        <span class="about-meta-num">80+</span>
+        <span class="about-meta-label">Projects</span>
+      </div>
+      <div class="about-meta-item">
+        <span class="about-meta-num">3</span>
+        <span class="about-meta-label">Disciplines</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Contact Section -->
+<section id="contact">
+  <h2 class="contact-heading reveal">
+    Let's create<br><em>something.</em>
+  </h2>
+
+  <div class="contact-info">
+    <div class="contact-email-block reveal">
+      <span class="contact-email-label">Say Hello</span>
+      <a href="mailto:hello@jaffstudio.com" class="contact-email">hello@jaffstudio.com</a>
+    </div>
+
+    <ul class="contact-socials reveal reveal-delay-2">
+      <li><a href="#">Instagram</a></li>
+      <li><a href="#">Behance</a></li>
+      <li><a href="#">LinkedIn</a></li>
+    </ul>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <span class="footer-copy">© Jaff Studio 2025. All rights reserved.</span>
+  <span class="footer-mark">We craft identity, motion &amp; presence.</span>
+</footer>
+
+<!-- Three.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+
+<script>
+// ── HERO TITLE CHAR SPLIT ──
+(function() {
+  const el = document.getElementById('hero-title');
+  const text = 'Jaff Studio';
+  let html = '';
+  let delay = 0;
+
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (ch === ' ') {
+      html += '<span style="display:inline-block;width:0.35em"></span>';
+    } else {
+      html += `<span class="char" style="animation-delay:${delay}s">${ch}</span>`;
+      delay += 0.05;
+    }
+  }
+
+  el.innerHTML = html;
+})();
+
+// ── CUSTOM CURSOR ──
+(function() {
+  const cursor = document.getElementById('cursor');
+  let cx = window.innerWidth / 2;
+  let cy = window.innerHeight / 2;
+  let tx = cx, ty = cy;
+
+  document.addEventListener('mousemove', e => {
+    tx = e.clientX;
+    ty = e.clientY;
+  });
+
+  document.querySelectorAll('a, button, .service-card, .hero-cta').forEach(el => {
+    el.addEventListener('mouseenter', () => cursor.classList.add('expand'));
+    el.addEventListener('mouseleave', () => cursor.classList.remove('expand'));
+  });
+
+  function loop() {
+    cx += (tx - cx) * 0.18;
+    cy += (ty - cy) * 0.18;
+    cursor.style.left = cx + 'px';
+    cursor.style.top = cy + 'px';
+    requestAnimationFrame(loop);
+  }
+  loop();
+})();
+
+// ── SCROLL REVEAL ──
+(function() {
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.15, rootMargin: '0px 0px -60px 0px' });
+
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+})();
+
+// ── THREE.JS RIBBON / SILK MESH ──
+(function() {
+  const canvas = document.getElementById('three-canvas');
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setClearColor(0x000000, 1);
+
+  const scene = new THREE.Scene();
+
+  const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 100);
+  camera.position.set(0, 0, 5);
+
+  // Cloth mesh parameters
+  const SEG_X = 80;
+  const SEG_Y = 50;
+  const WIDTH = 8;
+  const HEIGHT = 5;
+
+  const geometry = new THREE.PlaneGeometry(WIDTH, HEIGHT, SEG_X, SEG_Y);
+
+  // Store original positions for animation
+  const posAttr = geometry.attributes.position;
+  const origPositions = new Float32Array(posAttr.array.length);
+  for (let i = 0; i < posAttr.array.length; i++) {
+    origPositions[i] = posAttr.array[i];
+  }
+
+  const material = new THREE.MeshBasicMaterial({
+    color: 0xffffff,
+    wireframe: true,
+    transparent: true,
+    opacity: 0.07,
+  });
+
+  const mesh = new THREE.Mesh(geometry, material);
+  scene.add(mesh);
+
+  // Mouse tracking
+  let mouseX = 0, mouseY = 0;
+  let targetMouseX = 0, targetMouseY = 0;
+
+  document.addEventListener('mousemove', e => {
+    targetMouseX = (e.clientX / window.innerWidth - 0.5) * 2;
+    targetMouseY = -(e.clientY / window.innerHeight - 0.5) * 2;
+  });
+
+  // Resize
+  window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  });
+
+  const clock = new THREE.Clock();
+
+  function animate() {
+    requestAnimationFrame(animate);
+
+    const t = clock.getElapsedTime();
+
+    // Smooth mouse lag
+    mouseX += (targetMouseX - mouseX) * 0.04;
+    mouseY += (targetMouseY - mouseY) * 0.04;
+
+    // Animate cloth-like wave
+    const pos = geometry.attributes.position;
+    const count = pos.count;
+
+    for (let i = 0; i < count; i++) {
+      const ix = i % (SEG_X + 1);
+      const iy = Math.floor(i / (SEG_X + 1));
+
+      const ox = origPositions[i * 3];
+      const oy = origPositions[i * 3 + 1];
+
+      // Multi-frequency organic wave
+      const nx = ox / WIDTH;
+      const ny = oy / HEIGHT;
+
+      const wave1 = Math.sin(nx * 3 + t * 0.4) * Math.cos(ny * 2 + t * 0.3) * 0.35;
+      const wave2 = Math.sin(nx * 1.5 + t * 0.25 + 1.2) * Math.sin(ny * 3 + t * 0.35) * 0.2;
+      const wave3 = Math.cos(nx * 5 + t * 0.6) * Math.sin(ny * 1.5 + t * 0.2) * 0.1;
+
+      // Mouse parallax
+      const mouseInfluence = Math.sin(nx * Math.PI) * Math.sin((ny + 0.5) * Math.PI);
+      const mz = (mouseX * 0.4 + mouseY * 0.2) * mouseInfluence;
+
+      pos.setZ(i, wave1 + wave2 + wave3 + mz);
+    }
+
+    pos.needsUpdate = true;
+    geometry.computeVertexNormals();
+
+    // Subtle mesh rotation tied to mouse
+    mesh.rotation.x = mouseY * 0.08;
+    mesh.rotation.y = mouseX * 0.1;
+
+    renderer.render(scene, camera);
+  }
+
+  animate();
+})();
+</script>
+</body>
+</html>
